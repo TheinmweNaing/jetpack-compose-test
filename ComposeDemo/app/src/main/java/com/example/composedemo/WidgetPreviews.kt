@@ -1,14 +1,16 @@
 package com.example.composedemo
 
 import androidx.compose.Composable
+import androidx.ui.core.Text
 import androidx.ui.core.dp
 import androidx.ui.foundation.VerticalScroller
 import androidx.ui.layout.Column
 import androidx.ui.layout.HeightSpacer
 import androidx.ui.layout.Spacing
+import androidx.ui.material.AlertDialog
+import androidx.ui.material.Button
 import androidx.ui.material.MaterialTheme
 import androidx.ui.tooling.preview.Preview
-import java.util.*
 
 @Preview
 @Composable
@@ -70,4 +72,18 @@ fun MemberListItemPreview() {
             }
         }
     }
+}
+
+@Preview("Dialog Preview")
+@Composable
+fun AlertDialogPreview() {
+    AlertDialog(
+        onCloseRequest = {},
+        text = {
+            Text(text = "message")
+        },
+        confirmButton = {
+            Button(text = "Close")
+        }
+    )
 }

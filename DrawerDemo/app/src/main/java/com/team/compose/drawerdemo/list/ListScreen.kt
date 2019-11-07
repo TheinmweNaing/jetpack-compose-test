@@ -50,7 +50,7 @@ fun ListScreen(openDrawer: () -> Unit) {
 
 @Composable
 private fun ListItem(title: String) {
-    Ripple(bounded = false) {
+    Ripple(bounded = true) {
         Clickable {
             Container(expanded = true, alignment = Alignment.CenterLeft) {
                 Padding(padding = 16.dp) {

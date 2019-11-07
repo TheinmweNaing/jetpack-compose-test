@@ -4,9 +4,12 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.Composable
+import androidx.compose.ambient
 import androidx.compose.state
 import androidx.compose.unaryPlus
+import androidx.ui.animation.Crossfade
 import androidx.ui.core.*
+import androidx.ui.foundation.Clickable
 import androidx.ui.foundation.DrawImage
 import androidx.ui.foundation.shape.RectangleShape
 import androidx.ui.foundation.shape.border.Border
@@ -16,6 +19,8 @@ import androidx.ui.graphics.Color
 import androidx.ui.input.EditorStyle
 import androidx.ui.layout.*
 import androidx.ui.material.*
+import androidx.ui.material.ripple.Ripple
+import androidx.ui.material.surface.Surface
 import androidx.ui.res.imageResource
 import androidx.ui.text.TextStyle
 import androidx.ui.text.font.FontStyle
@@ -26,9 +31,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            NewStory {
-                Toast.makeText(this,"Clicked!", Toast.LENGTH_SHORT).show();
-            }
+            NewStory()
         }
     }
 }
@@ -37,8 +40,13 @@ class MainActivity : AppCompatActivity() {
 fun Input(value: String) {
     val state = +state { "" }
     state.value = value
+    val focused = +state { false }
+
     Container(expanded = true, height = 32.dp, padding = EdgeInsets(5.dp)) {
-        DrawBorder(shape = RoundedCornerShape(5.dp), border = Border(color = Color.Blue, width = 0.5.dp))
+        DrawBorder(
+            shape = RoundedCornerShape(5.dp),
+            border = Border(color = if (focused.value) Color.Blue else Color.DarkGray, width = 1.dp)
+        )
         TextField(
             value = state.value,
             onValueChange = { state.value = it },
@@ -46,25 +54,24 @@ fun Input(value: String) {
                 textStyle = TextStyle(
                     color = Color.Blue
                 )
-            )
+            ), onFocus = { focused.value = true },
+            onBlur = { focused.value = false }
         )
     }
 }
 
 @Composable
-fun NewStory(onClick: () -> Unit) {
+fun NewStory() {
     val image = +imageResource(R.drawable.poster)
+    val context = +ambient(ContextAmbient)
     MaterialTheme {
         Column(crossAxisSize = LayoutSize.Expand, modifier = Spacing(16.dp)) {
-            Button(style = ButtonStyle(
-                shape = RectangleShape,
-                elevation = 0.dp,
-                color = Color.Transparent,
-                paddings = EdgeInsets(0.dp)
-            ), onClick = onClick) {
-                Container(expanded = true, height = 180.dp) {
-                    Clip(shape = RoundedCornerShape(8.dp)) {
-                        DrawImage(image = image)
+            Ripple(bounded = true) {
+                Clickable {
+                    Container(expanded = true, height = 180.dp) {
+                        Clip(shape = RoundedCornerShape(8.dp)) {
+                            DrawImage(image = image)
+                        }
                     }
                 }
             }
@@ -77,14 +84,20 @@ fun NewStory(onClick: () -> Unit) {
                     fontStyle = FontStyle.Italic
                 )
             )
-            HeightSpacer(height = 8.dp)
+            HeightSpacer(height = 16.dp)
             Input(value = "TawWin Garden Hotel")
-            HeightSpacer(height = 8.dp)
-            Button(style = OutlinedButtonStyle(), onClick = onClick) {
+            HeightSpacer(height = 16.dp)
+            Input(value = ".............................")
+            HeightSpacer(height = 16.dp)
+            Button(style = OutlinedButtonStyle(), onClick = {
+                Toast.makeText(context, "Clicked!", Toast.LENGTH_SHORT).show()
+            }) {
                 Container(expanded = true) {
-                    Text(text = "Click Me!" , style = TextStyle(
-                        fontWeight = FontWeight.Bold
-                    ))
+                    Text(
+                        text = "Click Me!", style = TextStyle(
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
                 }
             }
         }
@@ -94,5 +107,5 @@ fun NewStory(onClick: () -> Unit) {
 @Preview
 @Composable
 fun DefaultPreview() {
-    NewStory(onClick = {})
+    NewStory()
 }
